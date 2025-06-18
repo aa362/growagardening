@@ -1,1 +1,26 @@
+local frame = script.Parent
+local imageLabel = frame:WaitForChild("ImageLabel")
 
+local frameWidth = 128
+local frameHeight = 128
+local totalFrames = 8
+local frameDuration = 0.1
+
+imageLabel.Image = "rbxassetid://138370900212366"
+imageLabel.ImageRectSize = Vector2.new(frameWidth, frameHeight)
+imageLabel.Size = UDim2.new(0, frameWidth, 0, frameHeight)
+imageLabel.BackgroundTransparency = 1
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 16)
+corner.Parent = imageLabel
+
+task.spawn(function()
+    local currentFrame = 0
+    while true do
+        local offsetX = currentFrame * frameWidth
+        imageLabel.ImageRectOffset = Vector2.new(offsetX, 0)
+        currentFrame = (currentFrame + 1) % totalFrames
+        task.wait(frameDuration)
+    end
+end)
