@@ -7,7 +7,7 @@ local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
 -- UI Window Setup
 local Window = Rayfield:CreateWindow({
-	Name = "4.0.0 - New Flow",
+	Name = "2.0 - New Flow",
 	LoadingTitle = "Booting Up...",
 	LoadingSubtitle = "Made By Glow a Guardian",
 	ConfigurationSaving = {
