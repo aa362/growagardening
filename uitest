@@ -45,7 +45,7 @@ local function showLoadingScreen()
     bottomTextLabel.Size = UDim2.new(1, 0, 0, 20)
     bottomTextLabel.Position = UDim2.new(0, 0, 1, -30)
     bottomTextLabel.BackgroundTransparency = 1
-    bottomTextLabel.Text = "Keyless Grow a Garden Script!"
+    bottomTextLabel.Text = "Save Duped Pets..."
     bottomTextLabel.TextColor3 = Color3.new(1, 1, 1)
     bottomTextLabel.Font = Enum.Font.SourceSansBold
     bottomTextLabel.TextSize = 16
