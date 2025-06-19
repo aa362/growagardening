@@ -62,7 +62,7 @@ local function showLoadingScreen()
 
     local currentFrame = 1
     local totalFrames = #frames
-    local animationSpeed = 0.2
+    local animationSpeed = 0.25
 
     while true do
         imageLabel.Image = frames[currentFrame]
