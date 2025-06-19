@@ -23,7 +23,7 @@ local function showLoadingScreen()
 
     local uiStroke = Instance.new("UIStroke")
     uiStroke.Thickness = 2
-    uiStroke.Color = Color3.new(1, 1, 1)  -- 修正済み：Color3の上限は1
+    uiStroke.Color = Color3.new(1, 1, 1)
     uiStroke.Parent = imageLabel
     uiStroke.Transparency = 0.7
 
@@ -71,5 +71,4 @@ local function showLoadingScreen()
     end
 end
 
--- 呼び出し
 showLoadingScreen()
