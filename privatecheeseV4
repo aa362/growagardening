@@ -62,7 +62,7 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 		statusLabel:UpdateLabel("SAVE STATUS: 🚀 Booting...")
 
 		local success, err = pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
 		end)
 
 		if success then
