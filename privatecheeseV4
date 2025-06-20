@@ -44,13 +44,11 @@ MainSection:NewButton("DUPE", "Duplicate your tool", function()
 	end
 end)
 
--- 状態表示（更新可能なように再生成）
-local statusLabel
+-- 状態表示（更新可能なように一度だけ作成し、内容だけ更新）
+local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
+
 local function setStatus(text)
-	if statusLabel then
-		statusLabel:Destroy()
-	end
-	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
+	statusLabel:Update("SAVE STATUS: " .. text)
 end
 
 setStatus("Ready")
