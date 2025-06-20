@@ -86,7 +86,7 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 		setStatus("🚀 Booting...")
 
 		local sound = Instance.new("Sound")
-		sound.SoundId = "rbxassetid://12222030" -- ピコン！みたいな効果音
+		sound.SoundId = "rbxassetid://142376088" -- ピコン！みたいな効果音
 		sound.Volume = 1
 		sound.Parent = player:WaitForChild("PlayerGui")
 		sound:Play()
