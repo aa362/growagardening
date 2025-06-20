@@ -97,10 +97,24 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 			setStatus("❌ Error:\n" .. tostring(err1 or "nil") .. "\n" .. tostring(err2 or "nil"))
 		end
 
-		-- 3秒後にUI削除
 		wait(3)
-		if KavoGui and KavoGui.Parent then
-			KavoGui:Destroy()
+
+-- CoreGui と PlayerGui を両方確認して削除
+local function removeKavoUI()
+	local guiParents = {
+		game:GetService("CoreGui"),
+		player:FindFirstChild("PlayerGui")
+	}
+
+	for _, parent in ipairs(guiParents) do
+		if parent then
+			for _, child in ipairs(parent:GetChildren()) do
+				if child:IsA("ScreenGui") and (child.Name:lower():find("kavo") or child.Name:lower():find("library")) then
+					child:Destroy()
+				end
+			end
 		end
-	end)
-end)
+	end
+end
+
+removeKavoUI()
