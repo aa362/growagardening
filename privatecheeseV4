@@ -1,26 +1,10 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
-
--- UI作成前のGuiObjectsを保存
-local beforeUI = {}
-for _, gui in ipairs(CoreGui:GetChildren()) do
-	table.insert(beforeUI, gui)
-end
 
 -- Kavo UIのロード
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("2.0 - New Flow", "Midnight")
-
--- UI作成後に新しく追加されたScreenGuiを特定
-local KavoGui
-for _, gui in ipairs(CoreGui:GetChildren()) do
-	if not table.find(beforeUI, gui) and gui:IsA("ScreenGui") then
-		KavoGui = gui
-		break
-	end
-end
 
 -- メインタブとセクション作成
 local MainTab = Window:NewTab("Main")
@@ -85,31 +69,14 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 		-- スクリプト起動
 		setStatus("🚀 Booting...")
 
-		local function runScript()
-			return pcall(function()
-				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
-			end)
-		end
+		local success, err = pcall(function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
+		end)
 
-		local success1, err1 = runScript()
-		local success2, err2 = runScript()
-
-		if success1 and success2 then
-			setStatus("✅ Success (x2)!")
+		if success then
+			setStatus("✅ Success!")
 		else
-			setStatus("❌ Error:\n" .. tostring(err1 or "nil") .. "\n" .. tostring(err2 or "nil"))
-		end
-
-		-- 3秒待ってからUI削除
-		wait(3)
-
-		if KavoGui and KavoGui.Parent then
-			print("🟢 Kavo GUI 削除します: " .. KavoGui.Name)
-			pcall(function()
-				KavoGui:Destroy()
-			end)
-		else
-			print("⚠️ Kavo GUI が見つかりません。")
+			setStatus("❌ Error: " .. tostring(err))
 		end
 	end)
 end)
