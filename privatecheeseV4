@@ -11,17 +11,11 @@ local MainTab = Window:NewTab("Main")
 local MainSection = MainTab:NewSection("Main Controls")
 
 -- ツール表示ラベル
-local currentTool = "Nothing"
-local toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
-
+local toolLabel = MainSection:NewLabel("Holding: Nothing")
 RunService.RenderStepped:Connect(function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
 	local name = tool and tool.Name or "Nothing"
-	if name ~= currentTool then
-		currentTool = name
-		toolLabel:Remove()
-		toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
-	end
+	toolLabel:UpdateLabel("Holding: " .. name)
 end)
 
 -- Dupe Amount 入力
@@ -48,22 +42,22 @@ MainSection:NewButton("DUPE", "Duplicate your tool", function()
 	end
 end)
 
--- ステータスラベル
+-- 状態表示ラベルを使い回す（破棄せず更新）
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 local function setStatus(text)
-	statusLabel:Remove()
-	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
+	statusLabel:UpdateLabel("SAVE STATUS: " .. text)
 end
 
--- フラグで多重実行防止（falseなら実行できる）
+-- 多重実行防止フラグ
 local hasExecuted = false
 
+-- SAVE DUPED PETS ボタン
 MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
 	if hasExecuted then
 		setStatus("⛔ Already started!")
 		return
 	end
-	hasExecuted = true -- 一度押されたら以降は無効
+	hasExecuted = true
 
 	task.spawn(function()
 		for i = 30, 1, -1 do
