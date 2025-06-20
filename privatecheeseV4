@@ -1,20 +1,20 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
+-- 状態ラベルを再作成する関数
+local statusLabel -- グローバルに保持しておく
 
-local MainTab = Window:NewTab("Main")
-local MainSection = MainTab:NewSection("Main Controls")
-
--- まずSAVE DUPED PETSボタンを先に作成！
-local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 local function setStatus(text)
-	statusLabel:Update("SAVE STATUS: " .. text)
+	-- 既存ラベルを削除（可能な場合）
+	if statusLabel then
+		statusLabel:Destroy()
+	end
+	-- 新しいラベル作成
+	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
 end
 
-local isRunning = false
-MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	if isRunning then return end
-	isRunning = true
+-- 初期表示
+setStatus("Ready")
 
+-- SAVE DUPED PETS ボタン
+MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
 	task.spawn(function()
 		for i = 30, 1, -1 do
 			setStatus("⌛ Loading pet info... (" .. i .. "s)")
@@ -32,41 +32,5 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 		else
 			setStatus("❌ Error: " .. tostring(err))
 		end
-
-		isRunning = false
 	end)
-end)
-
--- ここから他のUIを後ろに追加
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local player = Players.LocalPlayer
-
-local toolLabel = MainSection:NewLabel("Holding: Nothing")
-RunService.RenderStepped:Connect(function()
-	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-	local name = tool and tool.Name or "Nothing"
-	toolLabel:Update("Holding: " .. name)
-end)
-
-local dupeAmount = 1
-MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
-	local number = tonumber(text)
-	if number and number >= 1 and number <= 100 then
-		dupeAmount = number
-	else
-		warn("Enter a number between 1 and 100")
-	end
-end)
-
-MainSection:NewButton("DUPE", "Duplicate your tool", function()
-	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-	if not tool then
-		warn("No tool to duplicate.")
-		return
-	end
-	for i = 1, dupeAmount do
-		local clone = tool:Clone()
-		clone.Parent = player.Backpack
-	end
 end)
