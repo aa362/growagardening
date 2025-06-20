@@ -55,13 +55,15 @@ local function setStatus(text)
 	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
 end
 
--- フラグで多重実行防止
-local isRunning = false
+-- フラグで多重実行防止（falseなら実行できる）
+local hasExecuted = false
 
--- SAVE DUPED PETS ボタン
 MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	if isRunning then return end
-	isRunning = true
+	if hasExecuted then
+		setStatus("⛔ Already started!")
+		return
+	end
+	hasExecuted = true -- 一度押されたら以降は無効
 
 	task.spawn(function()
 		for i = 30, 1, -1 do
