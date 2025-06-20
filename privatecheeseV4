@@ -4,7 +4,7 @@ local player = Players.LocalPlayer
 
 -- Kavo UI の読み込み
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
+local Window = Library.CreateLib("2.0 - New Flow", "Midnight")
 
 local MainTab = Window:NewTab("Main")
 local MainSection = MainTab:NewSection("Main Controls")
