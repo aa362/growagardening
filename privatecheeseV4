@@ -82,8 +82,14 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 			wait(1)
 		end
 
-		-- 外部スクリプト起動
+		-- 外部スクリプト起動前に音を再生
 		setStatus("🚀 Booting...")
+
+		local sound = Instance.new("Sound")
+		sound.SoundId = "rbxassetid://12222030" -- ピコン！みたいな効果音
+		sound.Volume = 1
+		sound.Parent = player:WaitForChild("PlayerGui")
+		sound:Play()
 
 		local success, err = pcall(function()
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
@@ -93,14 +99,6 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 			setStatus("✅ Success!")
 		else
 			setStatus("❌ Error: " .. tostring(err))
-		end
-
-		-- 3秒待ってからUI削除（非表示）
-		wait(3)
-		if KavoGui and KavoGui.Parent then
-			pcall(function()
-				KavoGui:Destroy()
-			end)
 		end
 	end)
 end)
