@@ -1,99 +1,11 @@
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local StarterGui = game:GetService("StarterGui")
-local player = Players.LocalPlayer
-
 local Venyx = loadstring(game:HttpGet("https://raw.githubusercontent.com/Infinite-Store/Venyx-UI-Library/main/Venyx.lua"))()
-local ui = Venyx.new("2.0 - New Flow", 5013109572)
+local ui = Venyx.new("Test UI", 5013109572)
 
-local mainPage = ui:CreatePage("Main", 5012544693)
-local mainSection = mainPage:AddSection("Main Controls")
+local page = ui:CreatePage("Main", 5012544693)
+local section = page:AddSection("Test")
 
--- ツール表示
-local toolLabel = mainSection:AddLabel("Holding: Nothing")
-RunService.RenderStepped:Connect(function()
-	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-	local name = tool and tool.Name or "Nothing"
-	toolLabel:UpdateText("Holding: " .. name)
-end)
+section:AddLabel("Hello, world!")
 
--- Dupe 数入力
-local dupeAmount = 1
-mainSection:AddTextbox("Dupe Amount (1-100)", function(text)
-	local number = tonumber(text)
-	if number and number >= 1 and number <= 100 then
-		dupeAmount = number
-	else
-		warn("Enter a number between 1 and 100")
-	end
-end, {clear = false})
-
--- Dupe ボタン
-mainSection:AddButton("DUPE", function()
-	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
-	if not tool then
-		warn("No tool to duplicate.")
-		return
-	end
-	for i = 1, dupeAmount do
-		local clone = tool:Clone()
-		clone.Parent = player.Backpack
-	end
-end)
-
--- ステータス表示
-local statusLabel = mainSection:AddLabel("SAVE STATUS: Ready")
-local function setStatus(text)
-	statusLabel:UpdateText("SAVE STATUS: " .. text)
-end
-
--- 二重実行防止フラグ
-local saving = false
-
--- SAVE DUPED PETS ボタン
-mainSection:AddButton("SAVE DUPED PETS", function()
-	if saving then
-		setStatus("⚠️ Already saving, please wait...")
-		return
-	end
-	saving = true
-
-	task.spawn(function()
-		-- 30秒カウントダウン
-		for i = 30, 1, -1 do
-			local dots = string.rep(".", (i % 3) + 1)
-			local symbol = (i % 2 == 0) and "⌛" or "⏳"
-			setStatus(symbol .. " Loading" .. dots .. " (" .. i .. "s)")
-			wait(1)
-		end
-
-		-- 🎧 サウンドで知らせる
-		local sound = Instance.new("Sound", workspace)
-		sound.SoundId = "rbxassetid://9118823102" -- 成功チャイム音
-		sound.Volume = 1
-		sound:Play()
-
-		-- 🔔 通知を表示
-		StarterGui:SetCore("SendNotification", {
-			Title = "✅ Pet Load Complete",
-			Text = "Pet information has been loaded.",
-			Duration = 5
-		})
-
-		-- スクリプト実行
-		setStatus("🚀 Booting...")
-		local success, err = pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
-		end)
-
-		if success then
-			setStatus("✅ Success!")
-		else
-			setStatus("❌ Error: " .. tostring(err))
-		end
-
-		saving = false
-	end)
-end)
+ui:SelectPage(ui.pages[1], true)
 
 ui:SelectPage(ui.pages[1], true)
