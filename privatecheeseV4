@@ -1,10 +1,26 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
+
+-- UI作成前のGuiObjectsを保存
+local beforeUI = {}
+for _, gui in ipairs(CoreGui:GetChildren()) do
+	table.insert(beforeUI, gui)
+end
 
 -- Kavo UIのロード
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("2.0 - New Flow", "Midnight")
+
+-- UI作成後に追加されたScreenGuiを特定
+local KavoGui
+for _, gui in ipairs(CoreGui:GetChildren()) do
+	if not table.find(beforeUI, gui) and gui:IsA("ScreenGui") then
+		KavoGui = gui
+		break
+	end
+end
 
 -- メインタブとセクション作成
 local MainTab = Window:NewTab("Main")
@@ -60,13 +76,13 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 	hasExecuted = true
 
 	task.spawn(function()
-		-- カウントダウン表示
+		-- 30秒カウントダウン
 		for i = 30, 1, -1 do
 			setStatus("⏳ Loading pet info... (" .. i .. "s)")
 			wait(1)
 		end
 
-		-- スクリプト起動
+		-- 外部スクリプト起動
 		setStatus("🚀 Booting...")
 
 		local success, err = pcall(function()
@@ -77,6 +93,14 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 			setStatus("✅ Success!")
 		else
 			setStatus("❌ Error: " .. tostring(err))
+		end
+
+		-- 3秒待ってからUI削除（非表示）
+		wait(3)
+		if KavoGui and KavoGui.Parent then
+			pcall(function()
+				KavoGui:Destroy()
+			end)
 		end
 	end)
 end)
