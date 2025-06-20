@@ -4,7 +4,7 @@ local player = Players.LocalPlayer
 
 -- Kavo UIのロード
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "Darktheme")
+local Window = Library.CreateLib("2.0 - New Flow", "DarkTheme") 
 
 -- メインタブ作成
 local MainTab = Window:NewTab("Main")
@@ -51,17 +51,8 @@ end)
 -- 状態表示用ラベル
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 
--- 二重実行防止フラグ
-local isSaving = false
-
 -- SAVE DUPED PETS ボタン（30秒後にスクリプト実行）
 MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	if isSaving then
-		warn("Already saving, please wait.")
-		return
-	end
-
-	isSaving = true -- 処理開始
 	task.spawn(function()
 		for i = 30, 1, -1 do
 			statusLabel:UpdateLabel("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
@@ -79,7 +70,5 @@ MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", functi
 		else
 			statusLabel:UpdateLabel("SAVE STATUS: ❌ Error: " .. tostring(err))
 		end
-
-		isSaving = false -- 処理完了でフラグ戻す
 	end)
 end)
