@@ -4,7 +4,7 @@ local player = Players.LocalPlayer
 
 -- Kavo UIのロード
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "Midnight")
+local Window = Library.CreateLib("2.0 - New Flow", "Darktheme")
 
 -- UI削除用参照保持
 local UIRef = game.CoreGui:FindFirstChild("KavoUI") or Window
