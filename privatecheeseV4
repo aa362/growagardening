@@ -4,7 +4,7 @@ local player = Players.LocalPlayer
 
 -- Kavo UIのロード
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "DarkTheme") 
+local Window = Library.CreateLib("2.0 - New Flow", "Midnight") 
 
 -- メインタブ作成
 local MainTab = Window:NewTab("Main")
