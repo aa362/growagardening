@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
 
-local Venyx = loadstring(game:HttpGet("https://raw.githubusercontent.com/DenizDemirkaya/Venyx-UI-Library/main/source.lua"))()
+local Venyx = loadstring(game:HttpGet("https://raw.githubusercontent.com/Infinite-Store/Venyx-UI-Library/main/Venyx.lua"))()
 local ui = Venyx.new("2.0 - New Flow", 5013109572)
 
 local mainPage = ui:CreatePage("Main", 5012544693)
