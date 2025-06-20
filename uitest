@@ -13,42 +13,42 @@ local function showLoadingScreen()
     imageLabel.BackgroundTransparency = 1
     imageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
     imageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-    imageLabel.Size = UDim2.new(0, 175, 0, 126) -- 250x180 * 0.7 = 175x126
+    imageLabel.Size = UDim2.new(0, 200, 0, 144) -- 80% サイズ
     imageLabel.ScaleType = Enum.ScaleType.Stretch
     imageLabel.ImageTransparency = 0.3
 
     local uiCorner = Instance.new("UICorner")
-    uiCorner.CornerRadius = UDim.new(0, 14) -- 20 * 0.7
+    uiCorner.CornerRadius = UDim.new(0, 16)
     uiCorner.Parent = imageLabel
 
     local uiStroke = Instance.new("UIStroke")
-    uiStroke.Thickness = 1.4 -- 2 * 0.7
+    uiStroke.Thickness = 1.6
     uiStroke.Color = Color3.new(1, 1, 1)
     uiStroke.Parent = imageLabel
     uiStroke.Transparency = 0.7
 
     local topTextLabel = Instance.new("TextLabel")
     topTextLabel.Parent = imageLabel
-    topTextLabel.Size = UDim2.new(1, 0, 0, 14) -- 20 * 0.7
-    topTextLabel.Position = UDim2.new(0, 0, 0, 3)
+    topTextLabel.Size = UDim2.new(1, 0, 0, 16)
+    topTextLabel.Position = UDim2.new(0, 0, 0, 4)
     topTextLabel.BackgroundTransparency = 1
     topTextLabel.Text = "New Flow Version - 2.0"
     topTextLabel.TextColor3 = Color3.new(1, 1, 1)
     topTextLabel.Font = Enum.Font.SourceSansBold
-    topTextLabel.TextSize = 11.2 -- 16 * 0.7
+    topTextLabel.TextSize = 12.8
     topTextLabel.TextScaled = false
     topTextLabel.TextStrokeTransparency = 0.7
     topTextLabel.TextYAlignment = Enum.TextYAlignment.Center
 
     local bottomTextLabel = Instance.new("TextLabel")
     bottomTextLabel.Parent = imageLabel
-    bottomTextLabel.Size = UDim2.new(1, 0, 0, 14)
-    bottomTextLabel.Position = UDim2.new(0, 0, 1, -21) -- 30 * 0.7
+    bottomTextLabel.Size = UDim2.new(1, 0, 0, 16)
+    bottomTextLabel.Position = UDim2.new(0, 0, 1, -24)
     bottomTextLabel.BackgroundTransparency = 1
     bottomTextLabel.Text = "Save Duped Pets..."
     bottomTextLabel.TextColor3 = Color3.new(1, 1, 1)
     bottomTextLabel.Font = Enum.Font.SourceSansBold
-    bottomTextLabel.TextSize = 11.2
+    bottomTextLabel.TextSize = 12.8
     bottomTextLabel.TextScaled = false
     bottomTextLabel.TextStrokeTransparency = 0.7
     bottomTextLabel.TextYAlignment = Enum.TextYAlignment.Center
