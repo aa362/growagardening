@@ -10,11 +10,10 @@ local Window = Library.CreateLib("2.0 - New Flow", "Midnight")
 local MainTab = Window:NewTab("Main")
 local MainSection = MainTab:NewSection("Main Controls")
 
--- ツール名表示ラベル
+-- ツール表示ラベル
 local currentTool = "Nothing"
 local toolLabel = MainSection:NewLabel("Holding: " .. currentTool)
 
--- 定期更新：現在持っているツール名を表示
 RunService.RenderStepped:Connect(function()
 	local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
 	local name = tool and tool.Name or "Nothing"
@@ -25,7 +24,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Dupe 回数入力
+-- Dupe Amount 入力
 local dupeAmount = 1
 MainSection:NewTextBox("Dupe Amount (1-100)", "Enter a number", function(text)
 	local number = tonumber(text)
@@ -49,19 +48,20 @@ MainSection:NewButton("DUPE", "Duplicate your tool", function()
 	end
 end)
 
--- 状態表示ラベル（再生成のため参照）
+-- ステータスラベル
 local statusLabel = MainSection:NewLabel("SAVE STATUS: Ready")
 local function setStatus(text)
 	statusLabel:Remove()
 	statusLabel = MainSection:NewLabel("SAVE STATUS: " .. text)
 end
 
--- SAVE DUPED PETS ボタン（30秒後にスクリプト実行、1回のみ押せる）
-local saveButton
-saveButton = MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
-	if saveButton then
-		saveButton:Remove()
-	end
+-- フラグで多重実行防止
+local isRunning = false
+
+-- SAVE DUPED PETS ボタン
+MainSection:NewButton("SAVE DUPED PETS", "Starts saving after countdown", function()
+	if isRunning then return end
+	isRunning = true
 
 	task.spawn(function()
 		for i = 30, 1, -1 do
