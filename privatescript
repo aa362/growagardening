@@ -1,46 +1,18 @@
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local targetPetName = "Octopus"
 
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
-
--- ペットモデル作成（見た目だけ）
-local petModel = Instance.new("Model")
-petModel.Name = "RaccoonPet"
-
-local body = Instance.new("Part")
-body.Name = "Body"
-body.Size = Vector3.new(2, 2, 2)
-body.Shape = Enum.PartType.Ball
-body.Anchored = false
-body.BrickColor = BrickColor.new("Medium stone grey")
-body.Parent = petModel
-
-local tail = Instance.new("Part")
-tail.Name = "Tail"
-tail.Size = Vector3.new(1, 1, 2)
-tail.Position = body.Position + Vector3.new(0, 0, -1.5)
-tail.Anchored = false
-tail.BrickColor = BrickColor.new("Dark stone grey")
-tail.Parent = petModel
-
--- ペットの中心を決める
-local primary = Instance.new("Attachment", body)
-petModel.PrimaryPart = body
-petModel.Parent = workspace
-
--- BodyMoversで追従させる（BodyPosition）
-local bodyPosition = Instance.new("BodyPosition")
-bodyPosition.MaxForce = Vector3.new(100000, 100000, 100000)
-bodyPosition.P = 10000
-bodyPosition.D = 1000
-bodyPosition.Position = hrp.Position - hrp.CFrame.LookVector * 3 -- 初期位置
-bodyPosition.Parent = body
-
--- 毎フレーム位置更新（追従）
-RunService.RenderStepped:Connect(function()
-	if hrp and body then
-		bodyPosition.Position = hrp.Position - hrp.CFrame.LookVector * 3 + Vector3.new(0, 1, 0)
-	end
-end)
+for _, obj in ipairs(game:GetDescendants()) do
+    if (obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("Decal")) then
+        local parentName = obj.Parent and obj.Parent.Name or ""
+        if obj.Name:find(targetPetName) or parentName:find(targetPetName) then
+            print("Found pet-related object:")
+            print("  Name: ", obj:GetFullName())
+            if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") then
+                print("  MeshId: ", obj.MeshId)
+                print("  TextureId: ", obj.TextureId)
+            elseif obj:IsA("Decal") then
+                print("  Texture: ", obj.Texture)
+            end
+            print("-----")
+        end
+    end
+end
