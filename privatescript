@@ -1,42 +1,42 @@
 local Players = game:GetService("Players")
 local StarterGui = game:GetService("StarterGui")
-
 local player = Players.LocalPlayer
 
--- システムチャットに表示する関数
-local function printToChat(message)
-	StarterGui:SetCore("ChatMakeSystemMessage", {
-		Text = message,
-		Color = Color3.fromRGB(0, 255, 0),
-		Font = Enum.Font.SourceSansBold,
-		TextSize = 18
-	})
+-- 対象モデル名（例: Raccoon）
+local modelName = "Raccoon"
+local targetModel = workspace:FindFirstChild(modelName)
+
+if not targetModel then
+    StarterGui:SetCore("ChatMakeSystemMessage", {
+        Text = "❌ モデル '" .. modelName .. "' が workspace に見つかりません。",
+        Color = Color3.fromRGB(255, 100, 100),
+        Font = Enum.Font.SourceSansBold,
+        FontSize = Enum.FontSize.Size24,
+    })
+    return
 end
 
--- Raccoonのパーツをスキャンして情報を出力
-local function ScanForRaccoon()
-	for _, model in ipairs(workspace:GetDescendants()) do
-		if model:IsA("Model") and model.Name == "Raccoon" then
-			printToChat("✅ Raccoonモデルを検出しました。構成パーツ：")
-			for _, part in ipairs(model:GetDescendants()) do
-				if part:IsA("BasePart") then
-					local info = string.format(
-						"・%s | サイズ: %s | 色: %s | 形状: %s",
-						part.Name,
-						tostring(part.Size),
-						tostring(part.Color),
-						part.Shape and part.Shape.Name or "不明"
-					)
-					printToChat(info)
-					wait(0.1)
-				end
-			end
-			return
-		end
-	end
+-- メッシュ情報を左上チャットに表示
+for _, obj in ipairs(targetModel:GetDescendants()) do
+    if obj:IsA("MeshPart") then
+        StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "📦 MeshPart: " .. obj.Name ..
+                   "\n  MeshId: " .. (obj.MeshId or "なし") ..
+                   "\n  TextureId: " .. (obj.TextureID or "なし"),
+            Color = Color3.fromRGB(0, 255, 150),
+            Font = Enum.Font.SourceSansBold,
+            FontSize = Enum.FontSize.Size24,
+        })
 
-	printToChat("❌ Raccoonモデルが見つかりませんでした。")
+    elseif obj:IsA("SpecialMesh") then
+        StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "🔩 SpecialMesh: " .. obj.Name ..
+                   "\n  MeshId: " .. (obj.MeshId or "なし") ..
+                   "\n  TextureId: " .. (obj.TextureId or "なし"),
+            Color = Color3.fromRGB(100, 200, 255),
+            Font = Enum.Font.SourceSansBold,
+            FontSize = Enum.FontSize.Size24,
+        })
+    end
 end
 
--- 少し待ってからスキャン実行
-task.delay(3, ScanForRaccoon)
