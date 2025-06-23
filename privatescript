@@ -1,44 +1,10 @@
-local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Grow a Garden Spawner", "DarkTheme")
 
--- Spawnerを安全に読み込む（失敗してもUIは表示される）
-local Spawner
-local success, err = pcall(function()
-    Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
+local Tab = Window:NewTab("ペット")
+local Section = Tab:NewSection("スポーン")
+
+Section:NewButton("🐙 オクトパスをスポーン", "体重1 年齢1", function()
+    local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
+    Spawner.SpawnPet("Octopus", 1, 1)
 end)
-
--- ウィンドウ作成
-local Window = Rayfield:CreateWindow({
-	Name = "Grow a Garden Spawner",
-	LoadingTitle = "Loading...",
-	LoadingSubtitle = "by you",
-	ConfigurationSaving = {
-		Enabled = true,
-		FileName = "GardenUI"
-	},
-	KeySystem = false,
-	Theme = {
-		Mode = "Dark",
-		Accent = Color3.fromRGB(100, 200, 255)
-	}
-})
-
-local Tab = Window:CreateTab("ペット", 4483362458)
-
-if success and Spawner and Spawner.SpawnPet then
-	Tab:CreateButton({
-		Name = "🐙 オクトパスをスポーン",
-		Callback = function()
-			Spawner.SpawnPet("Octopus", 1, 1)
-			Rayfield:Notify({
-				Title = "成功",
-				Content = "オクトパスをスポーンしました！",
-				Duration = 5
-			})
-		end
-	})
-else
-	Tab:CreateParagraph({
-		Title = "エラー",
-		Content = "Spawnerを読み込めませんでした。URLが無効か、ゲームに対応していない可能性があります。"
-	})
-end
