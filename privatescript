@@ -1,63 +1,27 @@
 local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
-local ChatService = game:GetService("Chat")
-
+local Chat = game:GetService("Chat")
 local player = Players.LocalPlayer
-local targetName = "Raccoon"
 
-local function announceAppearance(model)
-    for _, obj in ipairs(model:GetDescendants()) do
-        local msgParts = {}
-
-        -- メッシュID・テクスチャID（MeshPart / SpecialMesh）
-        if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") then
-            if obj.MeshId and obj.MeshId ~= "" then
-                table.insert(msgParts, "MeshId: "..obj.MeshId)
-            end
-            if obj.TextureID and obj.TextureID ~= "" then
-                table.insert(msgParts, "TextureID: "..obj.TextureID)
-            end
-        end
-
-        -- Color3（Color）
-        if obj:IsA("BasePart") or obj:IsA("Decal") then
-            if obj.Color then
-                table.insert(msgParts, ("Color: %s"):format(tostring(obj.Color)))
-            end
-        end
-
-        -- サイズ
-        if obj:IsA("BasePart") then
-            table.insert(msgParts, ("Size: %s"):format(tostring(obj.Size)))
-        end
-
-        -- 形状（Partのみ）
-        if obj:IsA("Part") then
-            table.insert(msgParts, ("Shape: %s"):format(obj.Shape.Name))
-        end
-
-        -- メッセージがあればチャットに送る
-        if #msgParts > 0 then
-            local msg = string.format("[%s] %s - %s", targetName, obj.Name, table.concat(msgParts, ", "))
-            if player.Character and player.Character:FindFirstChild("Head") then
-                ChatService:Chat(player.Character.Head, msg, Enum.ChatColor.Blue)
-            end
-            print(msg)
+local function AnnouncePetParts(petModel)
+    for _, part in ipairs(petModel:GetDescendants()) do
+        if part:IsA("BasePart") then
+            local info = string.format(
+                "Name: %s, Size: %s, Shape: %s, Color: %s",
+                part.Name,
+                tostring(part.Size),
+                part.Shape.Name,
+                tostring(part.Color)
+            )
+            Chat:Chat(player.Character.Head, info, Enum.ChatColor.Blue)
         end
     end
 end
 
-local function onDescendantAdded(obj)
-    if obj:IsA("Model") and obj.Name == targetName then
-        task.wait(0.5)
-        announceAppearance(obj)
-    end
-end
+-- 例えばRaccoonをスポーンして、そのモデルを取得して使う場合
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
+Spawner.Load()
 
-for _, obj in ipairs(Workspace:GetDescendants()) do
-    if obj:IsA("Model") and obj.Name == targetName then
-        announceAppearance(obj)
-    end
+local pet = Spawner.SpawnPet("Raccoon", 1, 1)
+if pet then
+    AnnouncePetParts(pet)
 end
-
-Workspace.DescendantAdded:Connect(onDescendantAdded)
