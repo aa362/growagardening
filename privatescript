@@ -1,29 +1,42 @@
 local Players = game:GetService("Players")
-local Chat = game:GetService("Chat")
+local StarterGui = game:GetService("StarterGui")
+
 local player = Players.LocalPlayer
 
--- Raccoonを探して情報を表示
+-- システムチャットに表示する関数
+local function printToChat(message)
+	StarterGui:SetCore("ChatMakeSystemMessage", {
+		Text = message,
+		Color = Color3.fromRGB(0, 255, 0),
+		Font = Enum.Font.SourceSansBold,
+		TextSize = 18
+	})
+end
+
+-- Raccoonのパーツをスキャンして情報を出力
 local function ScanForRaccoon()
-	for _, obj in ipairs(workspace:GetDescendants()) do
-		if obj:IsA("Model") and obj.Name == "Raccoon" then
-			for _, part in ipairs(obj:GetDescendants()) do
+	for _, model in ipairs(workspace:GetDescendants()) do
+		if model:IsA("Model") and model.Name == "Raccoon" then
+			printToChat("✅ Raccoonモデルを検出しました。構成パーツ：")
+			for _, part in ipairs(model:GetDescendants()) do
 				if part:IsA("BasePart") then
 					local info = string.format(
-						"パーツ名: %s｜サイズ: %s｜形状: %s｜色: %s",
+						"・%s | サイズ: %s | 色: %s | 形状: %s",
 						part.Name,
 						tostring(part.Size),
-						part.Shape and part.Shape.Name or "不明",
-						tostring(part.Color)
+						tostring(part.Color),
+						part.Shape and part.Shape.Name or "不明"
 					)
-					Chat:Chat(player.Character.Head, info, Enum.ChatColor.Green)
-					wait(0.5) -- チャット表示間隔（スパム防止）
+					printToChat(info)
+					wait(0.1)
 				end
 			end
 			return
 		end
 	end
-	Chat:Chat(player.Character.Head, "❌ Raccoonモデルが見つかりません", Enum.ChatColor.Red)
+
+	printToChat("❌ Raccoonモデルが見つかりませんでした。")
 end
 
--- 少し待ってから実行（キャラが読み込まれるまで）
+-- 少し待ってからスキャン実行
 task.delay(3, ScanForRaccoon)
