@@ -1,18 +1,23 @@
-local Players = game:GetService("Players")
-local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
-local player = Players.LocalPlayer
-local ChatService = game:GetService("Chat")
+local Window = Rayfield:CreateWindow({
+	Name = "Octopus UI",
+	LoadingTitle = "Spawning Octopus...",
+	LoadingSubtitle = "by you",
+	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = nil,
+		FileName = "OctopusConfig"
+	},
+	KeySystem = false,
+	Theme = {
+		Mode = "Dark",
+		Accent = Color3.fromRGB(0, 255, 200)
+	}
+})
 
--- Spawnerをロード
-Spawner.Load()
-
--- チャットメッセージを監視してコマンドを実行
-player.Chatted:Connect(function(msg)
-    if msg:lower() == "!spawnoctopus" then
-        -- オクトパスをスポーン（体重1、年齢1で例）
-        Spawner.SpawnPet("Octopus", 1, 1)
-        -- チャットに通知
-        ChatService:Chat(player.Character.Head, "オクトパスをスポーンしました！", Enum.ChatColor.Blue)
-    end
-end)
+Rayfield:Notify({
+	Title = "確認",
+	Content = "UIが表示されていますか？",
+	Duration = 5
+})
