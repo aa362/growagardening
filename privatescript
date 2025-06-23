@@ -1,23 +1,34 @@
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
 
 local Window = Rayfield:CreateWindow({
-	Name = "Octopus UI",
-	LoadingTitle = "Spawning Octopus...",
+	Name = "Grow a Garden Spawner",
+	LoadingTitle = "Loading Spawner",
 	LoadingSubtitle = "by you",
 	ConfigurationSaving = {
 		Enabled = true,
 		FolderName = nil,
-		FileName = "OctopusConfig"
+		FileName = "GardenConfig"
 	},
 	KeySystem = false,
 	Theme = {
 		Mode = "Dark",
-		Accent = Color3.fromRGB(0, 255, 200)
+		Accent = Color3.fromRGB(102, 204, 255)
 	}
 })
 
-Rayfield:Notify({
-	Title = "確認",
-	Content = "UIが表示されていますか？",
-	Duration = 5
+-- メインタブを作成
+local MainTab = Window:CreateTab("Pet Spawner", 4483362458)
+
+-- ボタンを作成してオクトパスをスポーン
+MainTab:CreateButton({
+	Name = "🐙 オクトパスをスポーン",
+	Callback = function()
+		Spawner.SpawnPet("Octopus", 1, 1)
+		Rayfield:Notify({
+			Title = "完了",
+			Content = "オクトパスをスポーンしました！",
+			Duration = 4
+		})
+	end
 })
