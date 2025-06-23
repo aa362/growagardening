@@ -1,28 +1,18 @@
-local searchNames = {"Octopus", "OctopusModel", "Pet_Octopus"}
+local Players = game:GetService("Players")
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
 
-local function searchModel()
-    local placesToCheck = {
-        workspace,
-        game:GetService("ReplicatedStorage"),
-        game:GetService("ServerStorage"),
-        game:GetService("StarterPlayer"),
-    }
+local player = Players.LocalPlayer
+local ChatService = game:GetService("Chat")
 
-    for _, place in ipairs(placesToCheck) do
-        for _, name in ipairs(searchNames) do
-            local found = place:FindFirstChild(name, true) -- trueで再帰検索
-            if found then
-                print("Found model:", found:GetFullName())
-                return found
-            end
-        end
+-- Spawnerをロード
+Spawner.Load()
+
+-- チャットメッセージを監視してコマンドを実行
+player.Chatted:Connect(function(msg)
+    if msg:lower() == "!spawnoctopus" then
+        -- オクトパスをスポーン（体重1、年齢1で例）
+        Spawner.SpawnPet("Octopus", 1, 1)
+        -- チャットに通知
+        ChatService:Chat(player.Character.Head, "オクトパスをスポーンしました！", Enum.ChatColor.Blue)
     end
-    return nil
-end
-
-local foundModel = searchModel()
-if foundModel then
-    print("モデル発見:", foundModel:GetFullName())
-else
-    print("モデルは見つかりませんでした。")
-end
+end)
