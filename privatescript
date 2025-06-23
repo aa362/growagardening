@@ -1,27 +1,28 @@
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local Chat = game:GetService("Chat")
+local searchNames = {"Octopus", "OctopusModel", "Pet_Octopus"}
 
-local targetPetName = "Octopus"
+local function searchModel()
+    local placesToCheck = {
+        workspace,
+        game:GetService("ReplicatedStorage"),
+        game:GetService("ServerStorage"),
+        game:GetService("StarterPlayer"),
+    }
 
-local infoText = ""
-
-for _, obj in ipairs(game:GetDescendants()) do
-    if (obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("Decal")) then
-        local parentName = obj.Parent and obj.Parent.Name or ""
-        if obj.Name:find(targetPetName) or parentName:find(targetPetName) then
-            if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") then
-                infoText = infoText .. "MeshId: " .. tostring(obj.MeshId) .. " "
-                infoText = infoText .. "TextureId: " .. tostring(obj.TextureId) .. "\n"
-            elseif obj:IsA("Decal") then
-                infoText = infoText .. "Decal Texture: " .. tostring(obj.Texture) .. "\n"
+    for _, place in ipairs(placesToCheck) do
+        for _, name in ipairs(searchNames) do
+            local found = place:FindFirstChild(name, true) -- trueで再帰検索
+            if found then
+                print("Found model:", found:GetFullName())
+                return found
             end
         end
     end
+    return nil
 end
 
-if infoText == "" then
-    infoText = "No Octopus pet data found."
+local foundModel = searchModel()
+if foundModel then
+    print("モデル発見:", foundModel:GetFullName())
+else
+    print("モデルは見つかりませんでした。")
 end
-
-Chat:Chat(player.Character.Head, infoText, Enum.ChatColor.Blue)
