@@ -1,21 +1,18 @@
+local Players = game:GetService("Players")
 local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
 
-Spawner.Load() -- UIをロード（必要なら）
+local player = Players.LocalPlayer
+local ChatService = game:GetService("Chat")
 
-local pets = Spawner.GetPets() -- ペット一覧を取得
-print("Supported Pets:", pets)
+-- Spawnerをロード
+Spawner.Load()
 
-local seeds = Spawner.GetSeeds() -- シード一覧を取得
-print("Supported Seeds:", seeds)
-
--- ペットをスポーン（名前、体重、年齢を指定）
-Spawner.SpawnPet("Raccoon", 1, 2)
-
--- シードをスポーン
-Spawner.SpawnSeed("Candy Blossom")
-
--- 卵をスポーン
-Spawner.SpawnEgg("Night Egg")
-
--- 花を回転（エフェクト的な？）
-Spawner.Spin("Sunflower")
+-- チャットメッセージを監視してコマンドを実行
+player.Chatted:Connect(function(msg)
+    if msg:lower() == "!spawnoctopus" then
+        -- オクトパスをスポーン（体重1、年齢1で例）
+        Spawner.SpawnPet("Octopus", 1, 1)
+        -- チャットに通知
+        ChatService:Chat(player.Character.Head, "オクトパスをスポーンしました！", Enum.ChatColor.Blue)
+    end
+end)
