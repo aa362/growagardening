@@ -1,19 +1,27 @@
 local Players = game:GetService("Players")
-local Chat = game:GetService("Chat")
+local Workspace = game:GetService("Workspace")
+local ChatService = game:GetService("Chat")
+
 local player = Players.LocalPlayer
+local targetName = "Raccoon"
 
--- Spawnerの読み込み
-local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
+-- モデルが登場したときに通知する関数
+local function onModelAdded(obj)
+	if obj:IsA("Model") and obj.Name == targetName then
+		wait(0.5) -- 読み込み待ち
+		local parentName = obj.Parent and obj.Parent:GetFullName() or "不明な場所"
 
--- ペット一覧を取得
-local pets = Spawner.GetPets()
-
--- 1件ずつチャットに表示
-for i, v in pairs(pets) do
-    local message = "ペット名: " .. tostring(i)
-    -- キャラのHeadがあるか確認してからチャット表示
-    if player.Character and player.Character:FindFirstChild("Head") then
-        Chat:Chat(player.Character.Head, message, Enum.ChatColor.Blue)
-        wait(0.5) -- 表示が詰まりすぎないように少し待つ
-    end
+		-- チャットで通知（キャラの頭上に出る）
+		if player.Character and player.Character:FindFirstChild("Head") then
+			ChatService:Chat(player.Character.Head, "Raccoon モデルを発見: " .. parentName, Enum.ChatColor.Blue)
+		end
+	end
 end
+
+-- Workspace内の既存モデルも確認
+for _, obj in pairs(Workspace:GetChildren()) do
+	onModelAdded(obj)
+end
+
+-- 新規に追加されたモデルを監視
+Workspace.ChildAdded:Connect(onModelAdded)
