@@ -1,19 +1,19 @@
 local Players = game:GetService("Players")
+local Chat = game:GetService("Chat")
 local player = Players.LocalPlayer
 
 -- Spawnerの読み込み
 local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
 
--- シンプルなUI作成
-local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-screenGui.Name = "SimpleSpawnerUI"
+-- ペット一覧を取得
+local pets = Spawner.GetPets()
 
-local button = Instance.new("TextButton", screenGui)
-button.Size = UDim2.new(0, 200, 0, 50)
-button.Position = UDim2.new(0.5, -100, 0.5, -25)
-button.Text = "🐙 オクトパスを出す"
-button.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
-
-button.MouseButton1Click:Connect(function()
-    Spawner.SpawnPet("Octopus", 1, 1)
-end)
+-- 1件ずつチャットに表示
+for i, v in pairs(pets) do
+    local message = "ペット名: " .. tostring(i)
+    -- キャラのHeadがあるか確認してからチャット表示
+    if player.Character and player.Character:FindFirstChild("Head") then
+        Chat:Chat(player.Character.Head, message, Enum.ChatColor.Blue)
+        wait(0.5) -- 表示が詰まりすぎないように少し待つ
+    end
+end
