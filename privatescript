@@ -5,23 +5,59 @@ local ChatService = game:GetService("Chat")
 local player = Players.LocalPlayer
 local targetName = "Raccoon"
 
--- モデルが追加されたときに通知する関数
+local function announceAppearance(model)
+    for _, obj in ipairs(model:GetDescendants()) do
+        local msgParts = {}
+
+        -- メッシュID・テクスチャID（MeshPart / SpecialMesh）
+        if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") then
+            if obj.MeshId and obj.MeshId ~= "" then
+                table.insert(msgParts, "MeshId: "..obj.MeshId)
+            end
+            if obj.TextureID and obj.TextureID ~= "" then
+                table.insert(msgParts, "TextureID: "..obj.TextureID)
+            end
+        end
+
+        -- Color3（Color）
+        if obj:IsA("BasePart") or obj:IsA("Decal") then
+            if obj.Color then
+                table.insert(msgParts, ("Color: %s"):format(tostring(obj.Color)))
+            end
+        end
+
+        -- サイズ
+        if obj:IsA("BasePart") then
+            table.insert(msgParts, ("Size: %s"):format(tostring(obj.Size)))
+        end
+
+        -- 形状（Partのみ）
+        if obj:IsA("Part") then
+            table.insert(msgParts, ("Shape: %s"):format(obj.Shape.Name))
+        end
+
+        -- メッセージがあればチャットに送る
+        if #msgParts > 0 then
+            local msg = string.format("[%s] %s - %s", targetName, obj.Name, table.concat(msgParts, ", "))
+            if player.Character and player.Character:FindFirstChild("Head") then
+                ChatService:Chat(player.Character.Head, msg, Enum.ChatColor.Blue)
+            end
+            print(msg)
+        end
+    end
+end
+
 local function onDescendantAdded(obj)
-	if obj:IsA("Model") and obj.Name == targetName then
-		task.wait(0.5) -- 少し待つことで配置が安定する
-		local parentName = obj:GetFullName()
-
-		-- キャラクターがいて頭があるならチャット表示
-		if player.Character and player.Character:FindFirstChild("Head") then
-			ChatService:Chat(player.Character.Head, "Raccoon 発見: " .. parentName, Enum.ChatColor.Blue)
-		end
-	end
+    if obj:IsA("Model") and obj.Name == targetName then
+        task.wait(0.5)
+        announceAppearance(obj)
+    end
 end
 
--- 既存のものもチェック
 for _, obj in ipairs(Workspace:GetDescendants()) do
-	onDescendantAdded(obj)
+    if obj:IsA("Model") and obj.Name == targetName then
+        announceAppearance(obj)
+    end
 end
 
--- 新しく追加されたものを監視
 Workspace.DescendantAdded:Connect(onDescendantAdded)
