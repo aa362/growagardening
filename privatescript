@@ -2,26 +2,28 @@ local Players = game:GetService("Players")
 local Chat = game:GetService("Chat")
 local player = Players.LocalPlayer
 
-local function AnnouncePetParts(petModel)
-    for _, part in ipairs(petModel:GetDescendants()) do
-        if part:IsA("BasePart") then
-            local info = string.format(
-                "Name: %s, Size: %s, Shape: %s, Color: %s",
-                part.Name,
-                tostring(part.Size),
-                part.Shape.Name,
-                tostring(part.Color)
-            )
-            Chat:Chat(player.Character.Head, info, Enum.ChatColor.Blue)
-        end
-    end
+-- Raccoonを探して情報を表示
+local function ScanForRaccoon()
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("Model") and obj.Name == "Raccoon" then
+			for _, part in ipairs(obj:GetDescendants()) do
+				if part:IsA("BasePart") then
+					local info = string.format(
+						"パーツ名: %s｜サイズ: %s｜形状: %s｜色: %s",
+						part.Name,
+						tostring(part.Size),
+						part.Shape and part.Shape.Name or "不明",
+						tostring(part.Color)
+					)
+					Chat:Chat(player.Character.Head, info, Enum.ChatColor.Green)
+					wait(0.5) -- チャット表示間隔（スパム防止）
+				end
+			end
+			return
+		end
+	end
+	Chat:Chat(player.Character.Head, "❌ Raccoonモデルが見つかりません", Enum.ChatColor.Red)
 end
 
--- 例えばRaccoonをスポーンして、そのモデルを取得して使う場合
-local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
-Spawner.Load()
-
-local pet = Spawner.SpawnPet("Raccoon", 1, 1)
-if pet then
-    AnnouncePetParts(pet)
-end
+-- 少し待ってから実行（キャラが読み込まれるまで）
+task.delay(3, ScanForRaccoon)
