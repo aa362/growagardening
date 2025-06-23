@@ -1,2 +1,13 @@
-local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
-Spawner.Load()
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local success, result = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
+end)
+
+if success and result and result.Load then
+    print("✅ Spawner loaded")
+    result.Load()
+else
+    warn("❌ Spawner load failed")
+end
