@@ -1,13 +1,19 @@
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-local success, result = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
-end)
+-- Spawnerの読み込み
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
 
-if success and result and result.Load then
-    print("✅ Spawner loaded")
-    result.Load()
-else
-    warn("❌ Spawner load failed")
-end
+-- シンプルなUI作成
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "SimpleSpawnerUI"
+
+local button = Instance.new("TextButton", screenGui)
+button.Size = UDim2.new(0, 200, 0, 50)
+button.Position = UDim2.new(0.5, -100, 0.5, -25)
+button.Text = "🐙 オクトパスを出す"
+button.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
+
+button.MouseButton1Click:Connect(function()
+    Spawner.SpawnPet("Octopus", 1, 1)
+end)
