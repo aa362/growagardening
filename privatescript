@@ -1,4 +1,6 @@
 local Players = game:GetService("Players")
 local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
 local player = Players.LocalPlayer
+-- Spawnerをロード
 Spawner.Load()
+end)
