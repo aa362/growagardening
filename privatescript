@@ -5,23 +5,23 @@ local ChatService = game:GetService("Chat")
 local player = Players.LocalPlayer
 local targetName = "Raccoon"
 
--- モデルが登場したときに通知する関数
-local function onModelAdded(obj)
+-- モデルが追加されたときに通知する関数
+local function onDescendantAdded(obj)
 	if obj:IsA("Model") and obj.Name == targetName then
-		wait(0.5) -- 読み込み待ち
-		local parentName = obj.Parent and obj.Parent:GetFullName() or "不明な場所"
+		task.wait(0.5) -- 少し待つことで配置が安定する
+		local parentName = obj:GetFullName()
 
-		-- チャットで通知（キャラの頭上に出る）
+		-- キャラクターがいて頭があるならチャット表示
 		if player.Character and player.Character:FindFirstChild("Head") then
-			ChatService:Chat(player.Character.Head, "Raccoon モデルを発見: " .. parentName, Enum.ChatColor.Blue)
+			ChatService:Chat(player.Character.Head, "Raccoon 発見: " .. parentName, Enum.ChatColor.Blue)
 		end
 	end
 end
 
--- Workspace内の既存モデルも確認
-for _, obj in pairs(Workspace:GetChildren()) do
-	onModelAdded(obj)
+-- 既存のものもチェック
+for _, obj in ipairs(Workspace:GetDescendants()) do
+	onDescendantAdded(obj)
 end
 
--- 新規に追加されたモデルを監視
-Workspace.ChildAdded:Connect(onModelAdded)
+-- 新しく追加されたものを監視
+Workspace.DescendantAdded:Connect(onDescendantAdded)
