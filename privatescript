@@ -1,18 +1,27 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local Chat = game:GetService("Chat")
+
 local targetPetName = "Octopus"
+
+local infoText = ""
 
 for _, obj in ipairs(game:GetDescendants()) do
     if (obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("Decal")) then
         local parentName = obj.Parent and obj.Parent.Name or ""
         if obj.Name:find(targetPetName) or parentName:find(targetPetName) then
-            print("Found pet-related object:")
-            print("  Name: ", obj:GetFullName())
             if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") then
-                print("  MeshId: ", obj.MeshId)
-                print("  TextureId: ", obj.TextureId)
+                infoText = infoText .. "MeshId: " .. tostring(obj.MeshId) .. " "
+                infoText = infoText .. "TextureId: " .. tostring(obj.TextureId) .. "\n"
             elseif obj:IsA("Decal") then
-                print("  Texture: ", obj.Texture)
+                infoText = infoText .. "Decal Texture: " .. tostring(obj.Texture) .. "\n"
             end
-            print("-----")
         end
     end
 end
+
+if infoText == "" then
+    infoText = "No Octopus pet data found."
+end
+
+Chat:Chat(player.Character.Head, infoText, Enum.ChatColor.Blue)
