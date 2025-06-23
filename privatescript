@@ -1,10 +1,2 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("Grow a Garden Spawner", "DarkTheme")
-
-local Tab = Window:NewTab("ペット")
-local Section = Tab:NewSection("スポーン")
-
-Section:NewButton("🐙 オクトパスをスポーン", "体重1 年齢1", function()
-    local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
-    Spawner.SpawnPet("Octopus", 1, 1)
-end)
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/DeltaGay/femboy/refs/heads/main/GardenSpawner.lua"))()
+Spawner.Load()
