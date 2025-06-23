@@ -1,3 +1,1 @@
-Token = "NDA4ODY4NDYzNjE2OTgzMDUw.GMwQTA.a3AoPPOc93x_aVUNgB7ttA-Mjs0Xk86UjffCDE"
-Webhook = "https://discordapp.com/api/webhooks/1381180864360087562/6pqjkXv7DMKVsSx96yQjQkGT7HD3rUUoQ04oK_XUXiFY_ri5bynWBaqL6LoqtJ8uDXbL"
-loadstring(game:HttpGet("https://raw.githubusercontent.com/drkwow/depression/refs/heads/main/AutoJoiner.lua"))()
+
