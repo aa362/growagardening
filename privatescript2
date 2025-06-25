@@ -1,39 +1,43 @@
-local targetName = "Raccoon" -- 目標ペット名
-
--- Neonの赤い目パーツを作って設置する関数
 local function replaceEyesWithGlow(petModel)
 	for _, part in ipairs(petModel:GetDescendants()) do
-		-- Eyeという名前のDecalを非表示にして、そのPartに赤い球を貼り付け
 		if part:IsA("Decal") and part.Name:lower():find("eye") then
-			part.Transparency = 1
+			part.Transparency = 1 -- デカールを消す
 
 			local parentPart = part.Parent
-			if parentPart and parentPart:IsA("BasePart") then
-				local glowEye = Instance.new("Part")
-				glowEye.Name = "GlowEye"
-				glowEye.Shape = Enum.PartType.Ball
-				glowEye.Size = Vector3.new(0.2, 0.2, 0.2)
-				glowEye.Color = Color3.fromRGB(255, 0, 0)
-				glowEye.Material = Enum.Material.Neon
-				glowEye.Anchored = false
-				glowEye.CanCollide = false
-				glowEye.Massless = true
-				glowEye.CFrame = parentPart.CFrame * CFrame.new(0, 0, -0.1)
-				glowEye.Parent = petModel
+			if parentPart and parentPart:IsA("BasePart") and not parentPart:FindFirstChild("GlowEye") then
+				local glow = Instance.new("Part")
+				glow.Name = "GlowEye"
+				glow.Shape = Enum.PartType.Ball
+				glow.Size = Vector3.new(0.2, 0.2, 0.2)
+				glow.Color = Color3.fromRGB(255, 0, 0)
+				glow.Material = Enum.Material.Neon
+				glow.Anchored = false
+				glow.CanCollide = false
+				glow.Massless = true
+				glow.CFrame = parentPart.CFrame * CFrame.new(0, 0, -0.1)
+				glow.Parent = petModel
 
-				-- 目を追従させるためのWeld
 				local weld = Instance.new("WeldConstraint")
 				weld.Part0 = parentPart
-				weld.Part1 = glowEye
-				weld.Parent = glowEye
+				weld.Part1 = glow
+				weld.Parent = glow
 			end
 		end
 	end
 end
 
--- workspace内からRaccoonモデルを探す
-for _, model in ipairs(workspace:GetDescendants()) do
-	if model:IsA("Model") and model.Name == targetName then
-		replaceEyesWithGlow(model)
+-- Raccoonが新たに出現した時に処理するイベント
+workspace.ChildAdded:Connect(function(child)
+	if child:IsA("Model") and child.Name == "Raccoon" then
+		-- 少し待ってから処理（パーツがそろうまで待機）
+		task.wait(0.5)
+		replaceEyesWithGlow(child)
+	end
+end)
+
+-- すでに存在しているRaccoonにも適用（念のため）
+for _, obj in ipairs(workspace:GetChildren()) do
+	if obj:IsA("Model") and obj.Name == "Raccoon" then
+		replaceEyesWithGlow(obj)
 	end
 end
