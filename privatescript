@@ -1,2 +1,2 @@
-local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/drkwow/depression/refs/heads/main/Spawner.lua"))()
+local Spawner = loadstring(game:HttpGet("https://codeberg.org/DarkBackup/script/raw/branch/main/loadstring"))()
 Spawner.Load()
