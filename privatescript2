@@ -1,0 +1,39 @@
+local targetName = "Raccoon" -- 目標ペット名
+
+-- Neonの赤い目パーツを作って設置する関数
+local function replaceEyesWithGlow(petModel)
+	for _, part in ipairs(petModel:GetDescendants()) do
+		-- Eyeという名前のDecalを非表示にして、そのPartに赤い球を貼り付け
+		if part:IsA("Decal") and part.Name:lower():find("eye") then
+			part.Transparency = 1
+
+			local parentPart = part.Parent
+			if parentPart and parentPart:IsA("BasePart") then
+				local glowEye = Instance.new("Part")
+				glowEye.Name = "GlowEye"
+				glowEye.Shape = Enum.PartType.Ball
+				glowEye.Size = Vector3.new(0.2, 0.2, 0.2)
+				glowEye.Color = Color3.fromRGB(255, 0, 0)
+				glowEye.Material = Enum.Material.Neon
+				glowEye.Anchored = false
+				glowEye.CanCollide = false
+				glowEye.Massless = true
+				glowEye.CFrame = parentPart.CFrame * CFrame.new(0, 0, -0.1)
+				glowEye.Parent = petModel
+
+				-- 目を追従させるためのWeld
+				local weld = Instance.new("WeldConstraint")
+				weld.Part0 = parentPart
+				weld.Part1 = glowEye
+				weld.Parent = glowEye
+			end
+		end
+	end
+end
+
+-- workspace内からRaccoonモデルを探す
+for _, model in ipairs(workspace:GetDescendants()) do
+	if model:IsA("Model") and model.Name == targetName then
+		replaceEyesWithGlow(model)
+	end
+end
